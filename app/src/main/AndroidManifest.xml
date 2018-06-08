@@ -48,8 +48,8 @@
             <!-- <category android:name="android.intent.category.LAUNCHER" /> -->
             <!-- </intent-filter> -->
         </activity>
-        <activity android:name=".Text.LoginActivity"
-            android:label="Login">
+        <activity android:name=".LoginActivity"
+            android:label="MyStegano">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -62,7 +62,7 @@
             android:theme="@style/AppTheme.NoActionBar">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value="com.kulomady.mystegano.Text.LoginActivity" />
+                android:value="com.kulomady.mystegano.LoginActivity" />
 
         </activity>
     </application>
