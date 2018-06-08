@@ -113,6 +113,7 @@ public class EncodeActivity extends AppCompatActivity implements TextEncodingCal
 
                     String name_image = name + "_encoded" + ".png";
                     File encoded_file = new File(rootdir, name_image);
+
                     try {
                         encoded_file.createNewFile();
                         FileOutputStream fout_encoded_image = new FileOutputStream(encoded_file);

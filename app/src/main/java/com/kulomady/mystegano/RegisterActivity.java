@@ -1,9 +1,11 @@
 package com.kulomady.mystegano;
 
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Environment;
 import android.provider.MediaStore;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
@@ -12,15 +14,27 @@ import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.Toast;
 
+import com.kulomady.mystegano.Text.AsyncTaskCallback.TextEncodingCallback;
+import com.kulomady.mystegano.Text.ImageSteganography;
+import com.kulomady.mystegano.Text.TextEncoding;
+import com.kulomady.mystegano.utils.CheckPermissionUtil;
+import com.kulomady.mystegano.utils.PermissionUtil;
+
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.UUID;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 
-public class RegisterActivity extends AppCompatActivity {
+public class RegisterActivity extends AppCompatActivity
+        implements TextEncodingCallback, PermissionUtil.PermissionCallback {
 
     private static final String TAG = "RegisterActivity";
     private static final int SELECT_PICTURE = 100;
@@ -31,12 +45,16 @@ public class RegisterActivity extends AppCompatActivity {
     @BindView(R.id.btn_choose_image)
     Button btnChooseImage;
 
+    @BindView(R.id.input_username)
+    EditText edtUsername;
+
+    @BindView(R.id.input_password)
+    EditText edtPassword;
+
     private Uri filepath;
 
-    //Bitmaps
     private Bitmap original_image;
     private Bitmap encoded_image;
-
 
 
     @Override
@@ -56,6 +74,10 @@ public class RegisterActivity extends AppCompatActivity {
 
     @OnClick(R.id.btn_choose_image) void onButtonChooseImageClicked(){
         showImageChooser();
+    }
+
+    @OnClick(R.id.btn_signup) void onButtonSignupClicked(){
+        CheckPermissionUtil.checkWriteSdCard(this, this);
     }
 
     void showImageChooser(){
@@ -92,4 +114,77 @@ public class RegisterActivity extends AppCompatActivity {
         }
     }
 
+    private void doEncode(){
+
+        if (filepath != null){
+            if (edtPassword.getText() != null ){
+                ImageSteganography imageSteganography =
+                        new ImageSteganography(edtPassword.getText().toString(),
+                        edtUsername.getText().toString(),
+                        original_image);
+                TextEncoding textEncoding =
+                        new TextEncoding(RegisterActivity.this,
+                                RegisterActivity.this);
+
+                textEncoding.execute(imageSteganography);
+
+            }
+        }
+    }
+
+    private void doSaveImage() {
+        String name = UUID.randomUUID().toString();
+
+        ProgressDialog progressDialog = createProgressDialog();
+        progressDialog.show();
+        if (encoded_image != null){
+            saveEncodedImage(name);
+        }
+        progressDialog.dismiss();
+    }
+
+    private void saveEncodedImage(String name) {
+        String name_image = name + "_encoded" + ".png";
+        File encoded_file = new File(Environment.getExternalStoragePublicDirectory(
+                Environment.DIRECTORY_DOWNLOADS), name_image);//new File(rootdir, name_image);
+
+        try {
+            encoded_file.createNewFile();
+            FileOutputStream fout_encoded_image = new FileOutputStream(encoded_file);
+            encoded_image.compress(Bitmap.CompressFormat.PNG, 100, fout_encoded_image);
+            fout_encoded_image.flush();
+            fout_encoded_image.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private ProgressDialog createProgressDialog(){
+        ProgressDialog progressDialog = new ProgressDialog(RegisterActivity.this);
+        progressDialog.setTitle("Saving Image");
+        progressDialog.setMessage("Loading Please Wait...");
+
+        return progressDialog;
+    }
+
+    @Override
+    public void onStartTextEncoding() {
+
+    }
+
+    @Override
+    public void onCompleteTextEncoding(ImageSteganography result) {
+
+        if (result != null && result.isEncoded()){
+            encoded_image = result.getEncoded_image();
+            Toast.makeText(this, "Successfully encode", Toast.LENGTH_SHORT).show();
+            imgResult.setImageBitmap(encoded_image);
+            doSaveImage();
+        }
+    }
+
+    @Override
+    public void onPermissionCallbackResult(boolean success) {
+        doEncode();
+    }
 }
