@@ -1,0 +1,6 @@
+<resources>
+    <dimen name="fab_margin">16dp</dimen>
+    <dimen name="small_elevation">2dp</dimen>
+    <dimen name="medium_elevation">5dp</dimen>
+    <dimen name="large_elevation">8dp</dimen>
+</resources>
