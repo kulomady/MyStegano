@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.graphics.Bitmap;
 import android.net.Uri;
 import android.provider.MediaStore;
+import android.support.annotation.NonNull;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -16,15 +17,23 @@ import android.widget.LinearLayout;
 import android.widget.Toast;
 
 
-import com.kulomady.mystegano.Text.AsyncTaskCallback.TextDecodingCallback;
-import com.kulomady.mystegano.Text.ImageSteganography;
-import com.kulomady.mystegano.Text.TextDecoding;
+import com.kulomady.mystegano.repo.ApiClient;
+import com.kulomady.mystegano.repo.User;
+import com.kulomady.mystegano.stegano.AsyncTaskCallback.TextDecodingCallback;
+import com.kulomady.mystegano.stegano.ImageSteganography;
+import com.kulomady.mystegano.stegano.TextDecoding;
 
+import java.io.File;
 import java.io.IOException;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
+import okhttp3.MediaType;
+import okhttp3.RequestBody;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 public class LoginActivity extends AppCompatActivity implements TextDecodingCallback {
 
@@ -96,9 +105,15 @@ public class LoginActivity extends AppCompatActivity implements TextDecodingCall
                 Snackbar.make(wrapperLayout,"No Message Found", Snackbar.LENGTH_LONG).show();
             else{
                 if (!result.isSecretKeyWrong()){
-                    Snackbar.make(wrapperLayout,
-                            "Decoded and message is: " + result.getMessage(),
-                            Snackbar.LENGTH_LONG).show();
+                    String[] messages = result.getMessage().split("-");
+                    if(messages.length >0 ){
+                        String username = messages[0];
+                        String password = messages[1];
+                        String email = messages[2];
+                        User user = new User(username,password,email,result.getSecret_key(),"");
+                        doLogin(user);
+                    }
+
                 }
                 else {
                     Snackbar.make(wrapperLayout,"Wrong secret key", Snackbar.LENGTH_LONG).show();
@@ -123,6 +138,27 @@ public class LoginActivity extends AppCompatActivity implements TextDecodingCall
             //Execute Task
             textDecoding.execute(imageSteganography);
         }
+    }
+
+    private void doLogin(User user) {
+
+        Call<User> request = ApiClient.getIntance().service().login(user);
+        request.enqueue(new Callback<User>() {
+            @Override
+            public void onResponse(Call<User> call, Response<User> response) {
+                if(response.isSuccessful()){
+                    startActivity(new Intent(LoginActivity.this, MainActivity.class));
+                    finish();
+                } else {
+                    Snackbar.make(wrapperLayout,"User Not Found",Snackbar.LENGTH_LONG).show();
+                }
+            }
+
+            @Override
+            public void onFailure(Call<User> call, Throwable t) {
+                Snackbar.make(wrapperLayout,"User Not Found",Snackbar.LENGTH_LONG).show();
+            }
+        });
     }
 
     private void displaySelectedImage(Intent data) {

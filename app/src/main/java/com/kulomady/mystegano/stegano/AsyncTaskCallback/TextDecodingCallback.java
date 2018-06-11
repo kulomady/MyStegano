@@ -1,7 +1,7 @@
-package com.kulomady.mystegano.Text.AsyncTaskCallback;
+package com.kulomady.mystegano.stegano.AsyncTaskCallback;
 
 
-import com.kulomady.mystegano.Text.ImageSteganography;
+import com.kulomady.mystegano.stegano.ImageSteganography;
 
 /**
  * This the callback interface for TextDecoding AsyncTask.

@@ -1,4 +1,4 @@
-package com.kulomady.mystegano.Text;
+package com.kulomady.mystegano.stegano;
 
 import android.graphics.Bitmap;
 import android.graphics.Color;
@@ -60,7 +60,8 @@ public class EncodeDecode {
                     if (!messageEncodingStatus.isMessageEncoded()) {
 
                         // Shifting integer value by 2 in left and replacing the two least significant digits with the message_byte_array values..
-                        tmp = (byte) ((((integer_pixel_array[element] >> binary[channelIndex]) & 0xFF) & 0xFC) | ((messageEncodingStatus.getByteArrayMessage()[messageEncodingStatus.getCurrentMessageIndex()] >> toShift[(shiftIndex++)
+                        tmp = (byte) ((((integer_pixel_array[element] >> binary[channelIndex]) & 0xFF) & 0xFC)
+                                | ((messageEncodingStatus.getByteArrayMessage()[messageEncodingStatus.getCurrentMessageIndex()] >> toShift[(shiftIndex++)
                                 % toShift.length]) & 0x3));// 6
 
                         if (shiftIndex % toShift.length == 0) {
@@ -88,9 +89,7 @@ public class EncodeDecode {
                     }
 
                     result[resultIndex++] = tmp;
-
                 }
-
             }
 
         }

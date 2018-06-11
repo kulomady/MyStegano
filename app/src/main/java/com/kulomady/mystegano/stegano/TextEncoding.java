@@ -1,4 +1,4 @@
-package com.kulomady.mystegano.Text;
+package com.kulomady.mystegano.stegano;
 
 import android.app.Activity;
 import android.app.ProgressDialog;
@@ -7,7 +7,7 @@ import android.os.AsyncTask;
 import android.util.Log;
 
 
-import com.kulomady.mystegano.Text.AsyncTaskCallback.TextEncodingCallback;
+import com.kulomady.mystegano.stegano.AsyncTaskCallback.TextEncodingCallback;
 import com.kulomady.mystegano.utils.Crypto;
 import com.kulomady.mystegano.utils.Utility;
 

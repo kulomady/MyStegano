@@ -1,4 +1,4 @@
-package com.kulomady.mystegano.Text;
+package com.kulomady.mystegano.stegano;
 
 import android.graphics.Bitmap;
 import android.util.Log;
